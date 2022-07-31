@@ -1,0 +1,190 @@
+<head>
+    <style>
+        html,
+        body {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        .canvas-box {
+            background-color: aquamarine;
+            flex-basis: 1500px;
+            display: flex;
+            align-items: stretch;
+            overflow: hidden;
+        }
+
+        #canvas {
+            border: 1px solid;
+            background-color: green;
+            width: 100%;
+            height: auto;
+        }
+
+        .up {
+            display: flex;
+            flex-basis: 200px;
+        }
+
+        .down {
+            display: flex;
+            flex-basis: 200px;
+        }
+
+        button {
+            flex: 1
+        }
+    </style>
+</head>
+
+<body>
+<div class="up">
+    <button id="up">up</button>
+</div>
+<div class="down">
+    <button id="down">down</button>
+</div>
+<div class="canvas-box">
+    <canvas id="canvas"></canvas>
+</div>
+</body>
+
+<script>
+
+
+    var prev = null
+    var moved = false
+    var isMobile = false
+    var canv = document.getElementById('canvas');
+    var up = document.getElementById('up');
+    var down = document.getElementById('down');
+
+    up.addEventListener('touchstart', e => {
+        delta = {kind: "keyDown", key: "up"}
+        socket.send(JSON.stringify(delta))
+        e.preventDefault()
+    })
+    up.addEventListener('touchend', e => {
+        delta = {kind: "keyUp", key: "up"}
+        socket.send(JSON.stringify(delta))
+        e.preventDefault()
+    })
+
+    down.addEventListener('touchstart', e => {
+        delta = {kind: "keyDown", key: "down"}
+        socket.send(JSON.stringify(delta))
+        e.preventDefault()
+    })
+    down.addEventListener('touchend', e => {
+        delta = {kind: "keyUp", key: "down"}
+        socket.send(JSON.stringify(delta))
+        e.preventDefault()
+    })
+
+    // on browser
+    canv.addEventListener('mousemove', e => {
+        if (!isMobile) {
+            handleMove(e)
+        }
+    });
+
+    canv.addEventListener('mouseup', e => {
+        prev = null
+    });
+
+    // for mobile on touch
+    var canv = document.getElementById('canvas');
+
+    canv.addEventListener('touchmove', e => {
+        e.preventDefault()
+
+        moved = true
+
+        switch (e.touches.length) {
+            case 1:
+                ee = e.touches[0];
+                handleMove({offsetX: ee.clientX, offsetY: ee.clientY})
+                return
+            case 2:
+                handleClick(2)
+                return
+        }
+    });
+
+    canv.addEventListener('touchstart', e => {
+        isMobile = true
+
+        ee = e.touches[0];
+        prev = {x: ee.clientX, y: ee.clientY, time: Date.now()}
+        console.log(e)
+    })
+
+    canv.addEventListener('touchend', e => {
+        console.log(e)
+
+        if (!moved) {
+            handleClick(1)
+        }
+        prev = null
+        moved = false
+    })
+
+    function scale(n) {
+        // return Math.round(n * Math.abs(n) / 30 * 3);
+        if (Math.abs(n) < 10) {
+            return Math.round(n)
+        }
+        return Math.round(n * Math.abs(n) / 60 * 2);
+    }
+
+    function handleMove(e) {
+        if (!prev) {
+            prev = {x: e.offsetX, y: e.offsetY, time: Date.now()}
+            return
+        }
+        deltaX = (e.offsetX - prev.x)
+        deltaY = (e.offsetY - prev.y)
+
+        prev = {x: e.offsetX, y: e.offsetY, time: Date.now()}
+
+        delta = {kind: "move", x: scale(deltaX), y: scale(deltaY)}
+
+        console.log({x: e.offsetX, y: e.offsetY, z: e})
+        console.log({deltaX: deltaX, deltaY: deltaY})
+
+        socket.send(JSON.stringify(delta))
+    }
+
+    var lastClickRight
+
+    function handleClick(touchesCount) {
+
+        kind = "clickLeft"
+        if (touchesCount > 1) {
+            lastClickRight = Date.now()
+            kind = "clickRight"
+        }
+
+        if (kind == "clickLeft" && (Date.now() - lastClickRight) < 200) {
+            return
+        }
+        socket.send(JSON.stringify({kind: kind}))
+    }
+
+    var socket = new WebSocket("ws://" + window.location.host + "/echo");
+
+    socket.onopen = function () {
+        // alert("Status: Connected\n");
+    };
+
+    socket.onmessage = function (e) {
+        // output.innerHTML += "Server: " + e.data + "\n";
+    };
+
+    function send() {
+        socket.send(input.value);
+    }
+</script>
