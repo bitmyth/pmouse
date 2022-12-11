@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/bitmyth/pmouse/messages"
 	"net"
 	"net/http"
-	"pmouse/messages"
 	"strings"
 
 	"github.com/go-vgo/robotgo"
