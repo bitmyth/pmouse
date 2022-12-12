@@ -124,6 +124,10 @@
 
     canv.addEventListener('touchend', e => {
         console.log(e)
+        if (e.touches.length === 1) {
+            handleClick(2)
+            return
+        }
 
         if (!moved) {
             handleClick(1)
