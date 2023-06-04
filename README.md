@@ -2,7 +2,6 @@
 
 如果你的鼠标坏了，可以用这个软件替代鼠标。
 
-![运行截图](doc/screenshot.jpg)
 
 # 安装
 
@@ -15,8 +14,12 @@ go install github.com/bitmyth/pmouse@latest
 ```shell
 pmouse
 ```
+![运行截图](doc/screenshot.jpg)
 
 手机扫码就可以操作电脑的鼠标移动，点击
+
+![扫码后打卡网页效果截图](doc/mobile.jpg)
+
 
 # Description
 
