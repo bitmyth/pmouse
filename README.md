@@ -10,7 +10,9 @@ go install github.com/bitmyth/pmouse@latest
 
 # 运行
 
+```shell
 pmouse
+```
 
 手机扫码就可以操作电脑的鼠标移动，点击
 
@@ -28,4 +30,8 @@ go install github.com/bitmyth/pmouse@latest
 
 # Run
 
+```shell
 pmouse
+```
+
+then scan the QR code by your mobile, after that, you can use phone to control the pointer on screen
